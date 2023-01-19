@@ -1,7 +1,13 @@
-var warenkorb = []
+var warenkorb = [];
+var itemlist = [];
 
-$(document).ready(function(){
-    window.addEventListener('message', function( event ) {      
+$(document).ready(function () {
+  AddItem("clip", "VW GOLF", 10000);
+  AddItem("bulletproof", "Weste", 10000);
+  AddItem("fixtool", "Repairkit", 10000);
+  AddItem("phone", "Handy", 10000);
+  AddItem("firstaidkit", "Erste-Hilfe", 10000);
+  /* window.addEventListener('message', function( event ) {      
       if (event.data.action == 'open') {
 
         const warenkorb1 = document.getElementById("warenkorb-list");
@@ -26,50 +32,72 @@ $(document).ready(function(){
     $( ".close" ).click(function() {
       $('.container').fadeOut(300)
       $.post('http://police_shop/escape', JSON.stringify({}));
-    });
+    }); */
 });
 
-function AddWarenkorb(name, display, price) {
-  warenkorb.push({name: name, display: display, price: price});
+function RemoveItemFromBasket(id, name, display, price) {
+  document.getElementById(`ware-${id}`).remove();
 
-  $(".warenkorb-list").append
-  (`
-    <div class="warenkorb-list-elem">
-        <p><span style="font-size:20px;">1x</span>   `+ display +`  <span style="color:#40c240">$`+ price +`</p>
-    </div>
+  for (ware of warenkorb) {
+    if (ware.id === name) {
+      console.log("1");
+      warenkorb.pop(id);
+    }
+  }
+  console.log(warenkorb);
+}
+
+function AddWarenkorb(name, display, price) {
+  let id = Math.random().toString(36).slice(2);
+  warenkorb.push({id: id, name: name, display: display, price: price });
+
+  $(".warenliste").append(`
+  <div class="ware" id="ware-${id}">
+  <img src="items/${name}.png">
+  <h1>${display}</h1>
+  <span>${price}$</span>
+  
+  <i class="fa-solid fa-square-xmark" onclick="RemoveItemFromBasket('${id}','${name}', '${display}', ${price})"></i>
+  </div>
   `);
 
-  var current = $('#warenkorb-1').text();
+  /* var current = $('#warenkorb-1').text();
   var current2 = current.replace("$", "");
   var int = parseFloat(current2)
   
   $('#warenkorb-1').text('$' + (int + parseFloat(price)));
-
+  
   var xcurrent = $('#warenkorb-1').text();
   var xcurrent2 = xcurrent.replace("$", "");
   var xint = parseFloat(xcurrent2)
-
-  $('#warenkorb-2').text('$' + (xint + (xint * 0.00)));
+  
+  $('#warenkorb-2').text('$' + (xint + (xint * 0.00))); */
+  console.log(warenkorb);
 }
 
 function buy() {
-  $.post('http://police_shop/buy', JSON.stringify({warenkorb: warenkorb}));
-  $('.container').fadeOut(300)
-  $.post('http://police_shop/escape', JSON.stringify({}));
-  warenkorb = []
+  $.post("http://police_shop/buy", JSON.stringify({ warenkorb: warenkorb }));
+  $(".container").fadeOut(300);
+  $.post("http://police_shop/escape", JSON.stringify({}));
+  warenkorb = [];
 }
 
 function AddItem(name, display, price) {
-  $("#items-content").append
-      (`
-      
-      <div class="items-element">
-          <div class="items-element-inner" style="background-image: url(items/`+name+`.png);">
-
-          </div>
-          <div class="items-element-sub" onclick="AddWarenkorb('`+name+`', '`+display+`', '`+price+`')">
-              $`+price+`
-          </div>
-      </div>
-      `);
+  $(".list").append(
+    `
+  <div class="product" id="${name}-${price}">
+  <h1>${display}</h1>
+  <img src="items/${name}.png">
+  <span>${price}$</span>
+  <i class="fa-solid fa-basket-shopping" onclick="AddWarenkorb('` +
+      name +
+      `', '` +
+      display +
+      `', '` +
+      price +
+      `')"></i>
+  </div>
+  `
+  );
+  itemlist.push({ name: name, display: display, price: price });
 }
